@@ -6,9 +6,9 @@ public class DelayPoint : MonoBehaviour {
 
     public Transform selfTranform;
     Renderer render;
-    Vector3 starPos;
+    public Vector3 starPos;
 
-    public Vector3 vec;
+    Vector3 vec;
 
     public float factor = 1.0f;
 
@@ -16,7 +16,7 @@ public class DelayPoint : MonoBehaviour {
         selfTranform = transform;
         render = selfTranform.GetComponent<Renderer>();
 
-        starPos = selfTranform.localPosition;
+        starPos = selfTranform.position;
 
         //t2 = delayPoint.transform;
 
@@ -28,10 +28,34 @@ public class DelayPoint : MonoBehaviour {
         //newPosition = targetPoint;
 	}
 	
-	void Update () {
+    void Update()
+    {
+        if (Vector3.SqrMagnitude(this.starPos - selfTranform.position) > (0.1F * 0.1F)) {
+            Vector3 tmp = Vector3.zero;
+            this.starPos = Vector3.SmoothDamp(this.starPos, selfTranform.position, ref tmp, 0.3f);
+            this.vec = (this.starPos - selfTranform.position);
+            var localDir = selfTranform.InverseTransformDirection(this.vec).normalized;
+            var length = this.vec.magnitude;
+            this.vec = length * localDir * this.factor;
+        }
+        else
+        {
+            this.vec = Vector3.zero;
+        }
 
+        //var worldDirection = (starPos - selfTranform.position).normalized;
+        //this.starPos += Time.deltaTime * worldDirection * 3.0F;
+        //var veclength = worldDirection.magnitude * factor;
 
-        //starPos = Vector3.SmoothDamp(starPos, selfTranform.position, ref this.vec, 0.3f);
+        render.sharedMaterial.SetVector("_DragDirection", this.vec);
+
+        ////starPos = selfTranform.localPosition;
+    }
+
+	void LateUpdate () {
+
+        //Vector3 vec1 = Vector3.zero;
+        //starPos = Vector3.SmoothDamp(starPos, selfTranform.position, ref vec1, 0.3f);
 
         //if (Vector3.SqrMagnitude(this.vec) > (0.1F)) {
         //    this.vec *= -1;
@@ -40,9 +64,7 @@ public class DelayPoint : MonoBehaviour {
         //    this.vec = Vector3.zero;
         //}
 
-        var worldDirection = (starPos - selfTranform.localPosition);
-        var veclength = worldDirection.magnitude * factor;
-        this.vec = veclength * selfTranform.InverseTransformDirection(worldDirection);
+
         //UnityEngine.Debug.Log(result);
         //this.vec = (starPos - selfTranform.localPosition);
         //    /// Time.deltaTime;
@@ -52,7 +74,7 @@ public class DelayPoint : MonoBehaviour {
         ////targetPoint = t2.TransformPoint(Vector3.zero);
         
         ////newPosition = Vector3.SmoothDamp(newPosition, targetPoint, ref velocity, delayTime);
-        render.sharedMaterial.SetVector("_DragDirection", this.vec);
-        starPos = selfTranform.localPosition;
+        
+        
 	}
 }

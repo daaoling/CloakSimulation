@@ -38,14 +38,26 @@
 
 			v2f vert (appdata v) 
 			{
-				// _DragPoint.w = 1;
+				float xdelayFactor = abs(v.vertex.y);
+				const float PI = 3.14159;
+				float radian_z =  _DragDirection.z / (2 * PI);
+				float y_offset = abs(v.vertex.y) - cos(radian_z) * abs(v.vertex.y);
+				float z_offset = sin(radian_z) * abs(v.vertex.y);
+				
+				float radian_x =  _DragDirection.x / (2 * PI);
+				float y_offset_1 = abs(v.vertex.y) - cos(radian_x) * abs(v.vertex.y);
+				float x_offset = sin(radian_x) * abs(v.vertex.y);
+
+				// _DragDirection.w = 1;
 				//float4 localPos = mul(unity_WorldToObject, _DragPoint);
 				//float xdelayDir = localPos.x - v.vertex.x;
-				float xdelayFactor = abs(v.vertex.y);
+				
 				// float xdelayFactor = abs(v.vertex.x);
-				v.vertex.x += (_DragDirection.x * xdelayFactor);  
-				v.vertex.y += (_DragDirection.y * xdelayFactor);  
-				v.vertex.z += (_DragDirection.z * xdelayFactor);
+				//v.vertex.x += (_DragDirection.x * xdelayFactor);  
+				v.vertex.y += y_offset;
+				v.vertex.y += y_offset_1;
+				v.vertex.x += x_offset; 
+				v.vertex.z += z_offset;
 
 				v2f o;
 				o.vertex = UnityObjectToClipPos(v.vertex);
